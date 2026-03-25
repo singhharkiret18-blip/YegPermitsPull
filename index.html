@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YEG PERMITS — HVAC Lead Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;500;700&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --surface: #101010;
+  --surface2: #161616;
+  --surface3: #1e1e1e;
+  --border: #252525;
+  --border2: #2f2f2f;
+  --orange: #ff5500;
+  --orange2: #ff8800;
+  --orange-dim: rgba(255,85,0,0.12);
+  --orange-glow: rgba(255,85,0,0.25);
+  --green: #00e676;
+  --green-dim: rgba(0,230,118,0.12);
+  --blue: #2979ff;
+  --blue-dim: rgba(41,121,255,0.12);
+  --yellow: #ffd600;
+  --yellow-dim: rgba(255,214,0,0.12);
+  --red: #ff1744;
+  --red-dim: rgba(255,23,68,0.12);
+  --purple: #d500f9;
+  --text: #f0f0f0;
+  --text-mid: #888;
+  --text-dim: #444;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Barlow', sans-serif;
+  --display: 'Bebas Neue', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 2px; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: rgba(8,8,8,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0;
+  height: 56px;
+}
+
+.nav-logo {
+  font-family: var(--display);
+  font-size: 22px;
+  letter-spacing: 3px;
+  color: var(--orange);
+  padding: 0 24px;
+  border-right: 1px solid var(--border);
+  height: 100%;
+  display: flex; align-items: center;
+  white-space: nowrap;
+}
+
+.nav-tabs {
+  display: flex; height: 100%; flex: 1;
+}
+
+.nav-tab {
+  padding: 0 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  cursor: pointer;
+  border: none; background: none;
+  border-right: 1px solid var(--border);
+  height: 100%;
+  display: flex; align-items: center; gap: 8px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  position: relative;
+}
+
+.nav-tab:hover { color: var(--text); background: var(--surface); }
+.nav-tab.active { color: var(--orange); background: var(--orange-dim); }
+.nav-tab.active::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; background: var(--orange);
+}
+
+.nav-tab .tab-icon { font-size: 14px; }
+
+.nav-right {
+  margin-left: auto;
+  padding: 0 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+
+.live-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 10px;
+  color: var(--green);
+  letter-spacing: 1px;
+}
+
+.live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: blink 2s infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── PAGES ── */
+.page { display: none; padding-top: 56px; min-height: 100vh; }
+.page.active { display: block; }
+
+/* ── SHARED COMPONENTS ── */
+.container { max-width: 1400px; margin: 0 auto; padding: 28px 24px; }
+
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
+
+.section-title {
+  font-family: var(--display);
+  font-size: 20px; letter-spacing: 2px;
+  color: var(--text);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px; margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: 3px;
+  padding: 16px 18px;
+  transition: border-color 0.2s;
+}
+
+.stat-card:hover { border-left-color: var(--orange2); }
+.stat-num { font-family: var(--display); font-size: 36px; color: var(--orange); line-height: 1; }
+.stat-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
+.stat-sub { font-family: var(--mono); font-size: 10px; color: var(--text-mid); margin-top: 2px; }
+
+/* ── CONTROLS ── */
+.controls-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+}
+
+.ctrl-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 140px; }
+.ctrl-group label {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px;
+}
+
+select, input[type="text"], input[type="password"], input[type="number"] {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 12px;
+  font-family: var(--sans); font-size: 13px;
+  border-radius: 2px; outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  appearance: none;
+}
+
+select:focus, input:focus { border-color: var(--orange); }
+
+.btn {
+  background: var(--orange);
+  color: #000; border: none;
+  padding: 10px 20px;
+  font-family: var(--display); font-size: 17px;
+  letter-spacing: 1.5px; cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s; white-space: nowrap;
+}
+.btn:hover { background: var(--orange2); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { background: #2a2a2a; color: #555; cursor: not-allowed; transform: none; }
+
+.btn-sm {
+  background: var(--orange-dim);
+  color: var(--orange);
+  border: 1px solid var(--orange-glow);
+  padding: 6px 14px;
+  font-family: var(--display); font-size: 14px;
+  letter-spacing: 1px; cursor: pointer;
+  border-radius: 2px; transition: all 0.2s; white-space: nowrap;
+}
+.btn-sm:hover { background: var(--orange); color: #000; }
+.btn-sm:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--orange);
+  border: 1px solid var(--orange-glow);
+  padding: 8px 16px;
+  font-family: var(--display); font-size: 15px;
+  letter-spacing: 1px; cursor: pointer;
+  border-radius: 2px; transition: all 0.2s;
+}
+.btn-ghost:hover { background: var(--orange); color: #000; }
+
+/* ── BADGE ── */
+.badge {
+  display: inline-block; padding: 2px 8px;
+  border-radius: 2px; font-family: var(--mono);
+  font-size: 9px; font-weight: 500; letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.badge-new { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,230,118,0.25); }
+.badge-multi { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(41,121,255,0.25); }
+.badge-suite { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(255,214,0,0.25); }
+.badge-reno { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange-glow); }
+.badge-hot { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,23,68,0.25); }
+
+/* ── TABLE ── */
+.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+.table-toolbar {
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.table-title { font-family: var(--display); font-size: 16px; letter-spacing: 1px; }
+.table-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
+th {
+  padding: 9px 12px; text-align: left;
+  font-family: var(--mono); font-size: 9px;
+  color: var(--text-dim); text-transform: uppercase;
+  letter-spacing: 1px; font-weight: 500; white-space: nowrap;
+  cursor: pointer; user-select: none;
+}
+th:hover { color: var(--orange); }
+tbody tr { border-bottom: 1px solid #181818; transition: background 0.1s; cursor: pointer; }
+tbody tr:hover { background: var(--surface2); }
+td { padding: 10px 12px; vertical-align: top; }
+
+.addr-cell { font-weight: 600; color: var(--text); max-width: 180px; }
+.addr-cell .permit-num { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+.desc-cell { color: var(--text-mid); max-width: 260px; font-size: 11px; line-height: 1.5; }
+.val-cell { font-family: var(--mono); font-size: 11px; color: var(--green); white-space: nowrap; }
+.date-cell { font-family: var(--mono); font-size: 10px; color: var(--text-dim); white-space: nowrap; }
+.hood-cell { font-size: 11px; color: var(--text-mid); max-width: 120px; }
+
+.expand-btn {
+  background: none; border: none; color: var(--orange);
+  cursor: pointer; font-size: 12px; padding: 2px 4px;
+  transition: transform 0.2s; line-height: 1;
+}
+.expand-btn.open { transform: rotate(90deg); }
+
+/* ── RESEARCH PANEL ── */
+.research-row td { padding: 0 !important; background: #0c0c0c; }
+.research-panel {
+  padding: 20px 22px;
+  border-top: 1px solid var(--border);
+  border-bottom: 2px solid var(--orange);
+}
+.research-panel-title {
+  font-family: var(--display); font-size: 15px; letter-spacing: 1px;
+  color: var(--orange); margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+.research-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.research-col-title {
+  font-family: var(--mono); font-size: 9px; color: var(--orange);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 10px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.link-cluster { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+
+.dlink {
+  display: inline-block; padding: 4px 10px;
+  border-radius: 2px; font-family: var(--mono);
+  font-size: 10px; text-decoration: none;
+  transition: all 0.15s; white-space: nowrap;
+}
+.dlink-g { background: rgba(66,133,244,0.1); color: #4285f4; border: 1px solid rgba(66,133,244,0.2); }
+.dlink-g:hover { background: #4285f4; color: #fff; }
+.dlink-fb { background: rgba(24,119,242,0.1); color: #1877f2; border: 1px solid rgba(24,119,242,0.2); }
+.dlink-fb:hover { background: #1877f2; color: #fff; }
+.dlink-li { background: rgba(0,119,181,0.1); color: #0077b5; border: 1px solid rgba(0,119,181,0.2); }
+.dlink-li:hover { background: #0077b5; color: #fff; }
+.dlink-map { background: rgba(234,67,53,0.1); color: #ea4335; border: 1px solid rgba(234,67,53,0.2); }
+.dlink-map:hover { background: #ea4335; color: #fff; }
+.dlink-dir { background: rgba(255,214,0,0.1); color: var(--yellow); border: 1px solid rgba(255,214,0,0.2); }
+.dlink-dir:hover { background: var(--yellow); color: #000; }
+.dlink-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,230,118,0.2); }
+.dlink-green:hover { background: var(--green); color: #000; }
+
+.ai-box {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 2px; padding: 14px; min-height: 80px;
+}
+.ai-box.active { border-color: var(--orange); }
+.ai-placeholder { font-family: var(--mono); font-size: 10px; color: var(--text-dim); text-align: center; padding: 12px 0; line-height: 1.7; }
+.ai-result { font-size: 12px; line-height: 1.7; color: var(--text-mid); }
+.ai-result strong { color: var(--text); }
+
+/* ── STATUS NOTES ── */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 20px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.5px;
+  cursor: pointer; transition: all 0.2s;
+}
+.status-new { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,230,118,0.2); }
+.status-contacted { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(41,121,255,0.2); }
+.status-quoted { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(255,214,0,0.2); }
+.status-closed { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange-glow); }
+.status-dead { background: rgba(100,100,100,0.1); color: #666; border: 1px solid #333; }
+
+/* ── PAGINATION ── */
+.pagination {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 14px;
+  border-top: 1px solid var(--border);
+}
+.page-btn {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text-mid); padding: 5px 11px;
+  font-family: var(--mono); font-size: 11px;
+  cursor: pointer; border-radius: 2px; transition: all 0.2s;
+}
+.page-btn:hover, .page-btn.active { background: var(--orange); color: #000; border-color: var(--orange); }
+.page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ── LOADING ── */
+.loading-state { padding: 60px 20px; text-align: center; }
+.loading-state p { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 16px; }
+.loading-bar { width: 200px; height: 2px; background: var(--border); margin: 0 auto; border-radius: 1px; overflow: hidden; }
+.loading-bar::after { content: ''; display: block; height: 100%; width: 35%; background: var(--orange); animation: slide 0.9s infinite; border-radius: 1px; }
+@keyframes slide { 0%{transform:translateX(-100%)} 100%{transform:translateX(400%)} }
+
+.empty-state { padding: 60px 20px; text-align: center; }
+.empty-state .icon { font-size: 44px; margin-bottom: 12px; }
+.empty-state p { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 1px; }
+
+.error-bar {
+  background: var(--red-dim); border: 1px solid rgba(255,23,68,0.3);
+  color: var(--red); padding: 10px 16px; border-radius: 2px;
+  font-family: var(--mono); font-size: 11px; margin-bottom: 16px;
+  display: none;
+}
+
+/* ══════════════════════════════
+   PAGE 1 — PERMIT LEADS
+══════════════════════════════ */
+
+/* ══════════════════════════════
+   PAGE 2 — MAP VIEW
+══════════════════════════════ */
+#map-container {
+  width: 100%; height: calc(100vh - 56px);
+  position: relative;
+}
+
+#map-iframe {
+  width: 100%; height: 100%; border: none;
+}
+
+.map-sidebar {
+  position: absolute; top: 16px; left: 16px;
+  width: 320px; max-height: calc(100vh - 100px);
+  background: rgba(10,10,10,0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 3px; overflow: hidden;
+  display: flex; flex-direction: column;
+  z-index: 10;
+}
+
+.map-sidebar-header {
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.map-sidebar-title { font-family: var(--display); font-size: 16px; letter-spacing: 1.5px; color: var(--orange); }
+.map-sidebar-sub { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+.map-lead-list { overflow-y: auto; flex: 1; }
+
+.map-lead-item {
+  padding: 12px 16px; border-bottom: 1px solid #181818;
+  cursor: pointer; transition: background 0.15s;
+}
+.map-lead-item:hover { background: var(--surface2); }
+.map-lead-item.selected { background: var(--orange-dim); border-left: 2px solid var(--orange); }
+.map-lead-addr { font-size: 12px; font-weight: 600; color: var(--text); }
+.map-lead-meta { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 3px; }
+.map-lead-val { color: var(--green); }
+
+.map-controls {
+  position: absolute; top: 16px; right: 16px;
+  display: flex; flex-direction: column; gap: 8px; z-index: 10;
+}
+
+.map-filter-bar {
+  background: rgba(10,10,10,0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border); border-radius: 3px;
+  padding: 12px 14px; width: 220px;
+}
+
+.map-filter-title { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+.map-no-data {
+  position: absolute; inset: 0; display: flex;
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 12px;
+  background: var(--bg); z-index: 5;
+}
+.map-no-data p { font-family: var(--mono); font-size: 12px; color: var(--text-dim); text-align: center; }
+
+/* ══════════════════════════════
+   PAGE 3 — CRM / PIPELINE
+══════════════════════════════ */
+.pipeline-board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  min-height: 500px;
+}
+
+.pipeline-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.pipeline-col-header {
+  padding: 12px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.pipeline-col-name {
+  font-family: var(--mono); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 1px; font-weight: 500;
+}
+
+.pipeline-count {
+  font-family: var(--display); font-size: 18px;
+  line-height: 1;
+}
+
+.pipeline-cards { padding: 8px; min-height: 200px; }
+
+.pipeline-card {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 2px; padding: 10px 12px;
+  margin-bottom: 8px; cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.pipeline-card:hover { border-color: var(--orange-glow); transform: translateY(-1px); }
+.pipeline-card-addr { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.pipeline-card-meta { font-family: var(--mono); font-size: 9px; color: var(--text-dim); line-height: 1.6; }
+.pipeline-card-val { color: var(--green); }
+.pipeline-card-actions {
+  display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap;
+}
+
+.add-lead-btn {
+  width: 100%; padding: 8px;
+  background: none; border: 1px dashed var(--border2);
+  color: var(--text-dim); font-family: var(--mono);
+  font-size: 10px; cursor: pointer; border-radius: 2px;
+  transition: all 0.2s; margin: 8px;
+  width: calc(100% - 16px);
+}
+.add-lead-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+/* ══════════════════════════════
+   PAGE 4 — OUTREACH SCRIPTS
+══════════════════════════════ */
+.scripts-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.script-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 3px; overflow: hidden;
+}
+
+.script-header {
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.script-title { font-family: var(--display); font-size: 16px; letter-spacing: 1px; }
+.script-tag { font-family: var(--mono); font-size: 9px; }
+
+.script-body { padding: 16px; }
+
+.script-text {
+  font-size: 13px; line-height: 1.8; color: var(--text-mid);
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 2px; padding: 14px;
+  white-space: pre-wrap; font-family: var(--sans);
+  margin-bottom: 12px;
+}
+
+.script-tip {
+  font-family: var(--mono); font-size: 10px; color: var(--orange);
+  background: var(--orange-dim); border: 1px solid var(--orange-glow);
+  padding: 8px 12px; border-radius: 2px;
+}
+
+/* ══════════════════════════════
+   PAGE 5 — TRACKER
+══════════════════════════════ */
+.tracker-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px; margin-bottom: 24px;
+}
+
+.tracker-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 3px; padding: 20px;
+}
+
+.tracker-card-title {
+  font-family: var(--mono); font-size: 10px; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;
+}
+
+.weekly-goal {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.goal-label { font-size: 13px; color: var(--text-mid); }
+.goal-nums { font-family: var(--display); font-size: 22px; color: var(--orange); }
+
+.progress-bar {
+  height: 4px; background: var(--border2); border-radius: 2px;
+  overflow: hidden; margin-bottom: 12px;
+}
+.progress-fill { height: 100%; background: var(--orange); border-radius: 2px; transition: width 0.5s ease; }
+.progress-fill.green { background: var(--green); }
+
+.tally-btn {
+  width: 100%; padding: 10px;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); font-family: var(--display); font-size: 16px;
+  letter-spacing: 1px; cursor: pointer; border-radius: 2px;
+  transition: all 0.2s; margin-bottom: 6px;
+}
+.tally-btn:hover { background: var(--orange); color: #000; border-color: var(--orange); }
+
+.activity-log {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 2px; padding: 12px;
+  max-height: 200px; overflow-y: auto;
+}
+
+.activity-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 6px 0; border-bottom: 1px solid #1a1a1a;
+  font-size: 12px;
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-time { font-family: var(--mono); font-size: 9px; color: var(--text-dim); white-space: nowrap; margin-top: 2px; }
+.activity-text { color: var(--text-mid); line-height: 1.4; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  z-index: 2000; display: none;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 3px; width: 100%; max-width: 560px;
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-family: var(--display); font-size: 18px; letter-spacing: 1px; }
+.modal-close { background: none; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer; }
+.modal-close:hover { color: var(--red); }
+.modal-body { padding: 20px; }
+
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+textarea {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); padding: 10px 12px; font-family: var(--sans);
+  font-size: 13px; border-radius: 2px; outline: none;
+  resize: vertical; min-height: 80px; transition: border-color 0.2s;
+}
+textarea:focus { border-color: var(--orange); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .pipeline-board { grid-template-columns: repeat(2, 1fr); }
+  .research-grid { grid-template-columns: 1fr; }
+  .nav-tab span.tab-label { display: none; }
+  .map-sidebar { width: 260px; }
+}
+@media (max-width: 600px) {
+  .pipeline-board { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .nav-logo { padding: 0 12px; font-size: 18px; }
+  .nav-tab { padding: 0 12px; }
+  .container { padding: 16px 12px; }
+  .map-sidebar { width: calc(100vw - 32px); }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo">YEG PERMITS</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('leads')" id="tab-leads">
+      <span class="tab-icon">📋</span><span class="tab-label">Leads</span>
+    </button>
+    <button class="nav-tab" onclick="showPage('map')" id="tab-map">
+      <span class="tab-icon">🗺️</span><span class="tab-label">Map</span>
+    </button>
+    <button class="nav-tab" onclick="showPage('pipeline')" id="tab-pipeline">
+      <span class="tab-icon">⚡</span><span class="tab-label">Pipeline</span>
+    </button>
+    <button class="nav-tab" onclick="showPage('scripts')" id="tab-scripts">
+      <span class="tab-icon">💬</span><span class="tab-label">Scripts</span>
+    </button>
+    <button class="nav-tab" onclick="showPage('tracker')" id="tab-tracker">
+      <span class="tab-icon">🎯</span><span class="tab-label">Tracker</span>
+    </button>
+  </div>
+  <div class="nav-right">
+    <div class="live-badge"><div class="live-dot"></div>LIVE DATA</div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════
+     PAGE 1 — LEADS
+══════════════════════════════ -->
+<div class="page active" id="page-leads">
+  <div class="container">
+
+    <div class="stat-grid" id="statsBar" style="display:none">
+      <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total Permits</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-new">0</div><div class="stat-label">New Builds</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-value">—</div><div class="stat-label">Avg Value</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-hoods">0</div><div class="stat-label">Neighbourhoods</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-pipeline">0</div><div class="stat-label">In Pipeline</div><div class="stat-sub">click ⚡ to add</div></div>
+    </div>
+
+    <div class="controls-bar">
+      <div class="ctrl-group" style="min-width:180px">
+        <label>Category</label>
+        <select id="catFilter">
+          <option value="NEW_CONSTRUCTION">New Construction</option>
+          <option value="ALL_RESIDENTIAL">All Residential</option>
+          <option value="SINGLE">Single Detached</option>
+          <option value="MULTI">Multi-Unit / Fourplex</option>
+          <option value="SUITE">Basement Suites</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label>Min Value</label>
+        <select id="minVal">
+          <option value="0">Any</option>
+          <option value="100000">$100K+</option>
+          <option value="200000" selected>$200K+</option>
+          <option value="300000">$300K+</option>
+          <option value="500000">$500K+</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label>Date Range</label>
+        <select id="daysBack">
+          <option value="7">Last 7 days</option>
+          <option value="14" selected>Last 14 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="60">Last 60 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label>Neighbourhood</label>
+        <input type="text" id="hoodFilter" placeholder="e.g. Windermere...">
+      </div>
+      <div class="ctrl-group" style="min-width:130px">
+        <label>&nbsp;</label>
+        <button class="btn" id="fetchBtn" onclick="fetchLeads()">PULL LEADS</button>
+      </div>
+    </div>
+
+    <div class="error-bar" id="errorBar"></div>
+
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <div class="table-title">PERMIT LEADS</div>
+        <div class="table-actions">
+          <button class="btn-ghost" id="exportBtn" onclick="exportCSV()" style="display:none">EXPORT CSV</button>
+          <button class="btn-ghost" id="copyBtn" onclick="copyAddresses()" style="display:none">COPY ADDRESSES</button>
+        </div>
+      </div>
+      <div id="tableContent">
+        <div class="empty-state">
+          <div class="icon">🏗️</div>
+          <p>SET FILTERS AND PULL LEADS</p>
+          <p style="margin-top:6px;color:#333">LIVE DATA FROM EDMONTON OPEN DATA PORTAL</p>
+        </div>
+      </div>
+      <div class="pagination" id="pagination" style="display:none"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 2 — MAP
+══════════════════════════════ -->
+<div class="page" id="page-map">
+  <div id="map-container">
+    <div class="map-no-data" id="mapNoData">
+      <div style="font-size:48px">🗺️</div>
+      <p>PULL LEADS FIRST<br>Then switch to Map view to see all permits on a map</p>
+      <button class="btn" onclick="showPage('leads')">GO TO LEADS</button>
+    </div>
+
+    <div class="map-sidebar" id="mapSidebar" style="display:none">
+      <div class="map-sidebar-header">
+        <div class="map-sidebar-title">PERMIT MAP</div>
+        <div class="map-sidebar-sub" id="mapLeadCount">0 LOCATIONS LOADED</div>
+      </div>
+      <div class="map-lead-list" id="mapLeadList"></div>
+    </div>
+
+    <iframe id="mapFrame" style="display:none;width:100%;height:100%;border:none"></iframe>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 3 — PIPELINE
+══════════════════════════════ -->
+<div class="page" id="page-pipeline">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title">PIPELINE TRACKER</div>
+      <button class="btn-sm" onclick="openAddModal()">+ ADD LEAD MANUALLY</button>
+    </div>
+
+    <div class="stat-grid" style="margin-bottom:20px">
+      <div class="stat-card" id="pl-new-card"><div class="stat-num" id="pl-new" style="color:var(--green)">0</div><div class="stat-label">New</div></div>
+      <div class="stat-card" id="pl-cont-card"><div class="stat-num" id="pl-cont" style="color:var(--blue)">0</div><div class="stat-label">Contacted</div></div>
+      <div class="stat-card" id="pl-quot-card"><div class="stat-num" id="pl-quot" style="color:var(--yellow)">0</div><div class="stat-label">Quoted</div></div>
+      <div class="stat-card" id="pl-clos-card"><div class="stat-num" id="pl-clos" style="color:var(--orange)">0</div><div class="stat-label">Closed</div></div>
+      <div class="stat-card" id="pl-dead-card"><div class="stat-num" id="pl-dead" style="color:#555">0</div><div class="stat-label">Dead</div></div>
+    </div>
+
+    <div class="pipeline-board" id="pipelineBoard">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 4 — SCRIPTS
+══════════════════════════════ -->
+<div class="page" id="page-scripts">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title">OUTREACH SCRIPTS</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">COPY · CUSTOMIZE · SEND</div>
+    </div>
+    <div class="scripts-grid" id="scriptsGrid"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 5 — TRACKER
+══════════════════════════════ -->
+<div class="page" id="page-tracker">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title">DAILY ACTIVITY TRACKER</div>
+      <button class="btn-sm" onclick="resetWeek()">RESET WEEK</button>
+    </div>
+
+    <div class="tracker-grid">
+      <div class="tracker-card">
+        <div class="tracker-card-title">📞 Outreach Calls / DMs</div>
+        <div class="weekly-goal">
+          <span class="goal-label">Today</span>
+          <span class="goal-nums" id="calls-today">0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="calls-bar" style="width:0%"></div></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-bottom:10px">GOAL: 5 PER DAY</div>
+        <button class="tally-btn" onclick="tally('calls')">+ LOG CALL / DM</button>
+        <button class="tally-btn" style="background:var(--red-dim);border-color:rgba(255,23,68,0.2);color:var(--red)" onclick="untally('calls')">− UNDO</button>
+      </div>
+
+      <div class="tracker-card">
+        <div class="tracker-card-title">🏗️ Site Visits</div>
+        <div class="weekly-goal">
+          <span class="goal-label">Today</span>
+          <span class="goal-nums" id="visits-today">0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill green" id="visits-bar" style="width:0%"></div></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-bottom:10px">GOAL: 3 PER DAY</div>
+        <button class="tally-btn" onclick="tally('visits')">+ LOG SITE VISIT</button>
+        <button class="tally-btn" style="background:var(--red-dim);border-color:rgba(255,23,68,0.2);color:var(--red)" onclick="untally('visits')">− UNDO</button>
+      </div>
+
+      <div class="tracker-card">
+        <div class="tracker-card-title">📋 Quotes Sent</div>
+        <div class="weekly-goal">
+          <span class="goal-label">This Week</span>
+          <span class="goal-nums" id="quotes-week">0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="quotes-bar" style="width:0%;background:var(--yellow)"></div></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-bottom:10px">GOAL: 5 PER WEEK</div>
+        <button class="tally-btn" onclick="tally('quotes')">+ LOG QUOTE SENT</button>
+        <button class="tally-btn" style="background:var(--red-dim);border-color:rgba(255,23,68,0.2);color:var(--red)" onclick="untally('quotes')">− UNDO</button>
+      </div>
+
+      <div class="tracker-card">
+        <div class="tracker-card-title">💰 Leads Research</div>
+        <div class="weekly-goal">
+          <span class="goal-label">Today</span>
+          <span class="goal-nums" id="research-today">0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="research-bar" style="width:0%;background:var(--purple)"></div></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-bottom:10px">GOAL: 10 LEADS/DAY</div>
+        <button class="tally-btn" onclick="tally('research')">+ LOG LEAD RESEARCHED</button>
+        <button class="tally-btn" style="background:var(--red-dim);border-color:rgba(255,23,68,0.2);color:var(--red)" onclick="untally('research')">− UNDO</button>
+      </div>
+    </div>
+
+    <div class="card" style="padding:20px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">📝 ACTIVITY LOG</div>
+      <div class="activity-log" id="activityLog">
+        <div class="activity-item">
+          <div class="activity-time">—</div>
+          <div class="activity-text" style="color:var(--text-dim)">No activity logged yet today.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:20px;margin-top:16px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">📈 WEEKLY SUMMARY</div>
+      <div id="weeklySummary" style="font-family:var(--mono);font-size:11px;color:var(--text-mid);line-height:2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ADD LEAD MODAL ── -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">ADD LEAD TO PIPELINE</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Address / Project Name</label>
+        <input type="text" id="m-addr" placeholder="e.g. 123 Main St NW or Rise Homes Fourplex">
+      </div>
+      <div class="form-group">
+        <label>Builder / Contact Name</label>
+        <input type="text" id="m-builder" placeholder="e.g. Ravi Singh / Rise Homes">
+      </div>
+      <div class="form-group">
+        <label>Phone / Email / Social</label>
+        <input type="text" id="m-contact" placeholder="e.g. 780-555-0123">
+      </div>
+      <div class="form-group">
+        <label>Project Type</label>
+        <select id="m-type">
+          <option value="NEW BUILD">New Build</option>
+          <option value="FOURPLEX">Fourplex</option>
+          <option value="SUITE">Basement Suite</option>
+          <option value="CUSTOM">Custom Home</option>
+          <option value="RENO">Renovation</option>
+          <option value="OTHER">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Est. Value ($)</label>
+        <input type="number" id="m-value" placeholder="e.g. 8500">
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="m-notes" placeholder="Met on site, referred by Ravi, etc."></textarea>
+      </div>
+      <button class="btn" style="width:100%" onclick="saveNewLead()">ADD TO PIPELINE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── LEAD DETAIL MODAL ── -->
+<div class="modal-overlay" id="leadModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="lm-title">LEAD DETAIL</div>
+      <button class="modal-close" onclick="closeLeadModal()">✕</button>
+    </div>
+    <div class="modal-body" id="lm-body"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════
+// STATE
+// ══════════════════════════════
+let allLeads = [];
+let currentPage = 1;
+const PER_PAGE = 25;
+let expandedRows = new Set();
+let researchCache = {};
+let pipeline = JSON.parse(localStorage.getItem('yeg_pipeline') || '[]');
+let tracker = JSON.parse(localStorage.getItem('yeg_tracker') || '{}');
+let activityLog = JSON.parse(localStorage.getItem('yeg_activity') || '[]');
+let sortCol = null, sortDir = 1;
+
+// ══════════════════════════════
+// NAV
+// ══════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'map') renderMap();
+  if (name === 'pipeline') renderPipeline();
+  if (name === 'tracker') renderTracker();
+  if (name === 'scripts') renderScripts();
+}
+
+// ══════════════════════════════
+// LEADS — FETCH & RENDER
+// ══════════════════════════════
+function buildQuery() {
+  const cat = document.getElementById('catFilter').value;
+  const minV = parseInt(document.getElementById('minVal').value);
+  const days = parseInt(document.getElementById('daysBack').value);
+  const hood = document.getElementById('hoodFilter').value.trim().toUpperCase();
+  const past = new Date(Date.now() - days * 86400000).toISOString().split('T')[0] + 'T00:00:00.000';
+
+  let w = `issue_date >= '${past}'`;
+  if (minV > 0) w += ` AND construction_value >= ${minV}`;
+
+  const cats = {
+    NEW_CONSTRUCTION: `(upper(job_description) LIKE '%NEW SINGLE%' OR upper(job_description) LIKE '%NEW DUPLEX%' OR upper(job_description) LIKE '%NEW ROW%' OR upper(job_description) LIKE '%NEW SEMI%' OR upper(job_description) LIKE '%NEW FOURPLEX%' OR upper(job_description) LIKE '%NEW TRIPLEX%' OR upper(job_description) LIKE '%CONSTRUCT%HOUSE%' OR upper(job_description) LIKE '%CONSTRUCT%DWELLING%')`,
+    ALL_RESIDENTIAL: `(upper(building_type) LIKE '%RESIDENTIAL%' OR upper(building_type) LIKE '%SINGLE DETACHED%' OR upper(building_type) LIKE '%DUPLEX%')`,
+    SINGLE: `(upper(building_type) LIKE '%SINGLE DETACHED%' OR upper(job_description) LIKE '%SINGLE DETACHED%')`,
+    MULTI: `(upper(building_type) LIKE '%FOURPLEX%' OR upper(building_type) LIKE '%TRIPLEX%' OR upper(building_type) LIKE '%ROW HOUSE%' OR upper(job_description) LIKE '%FOURPLEX%' OR upper(job_description) LIKE '%TRIPLEX%')`,
+    SUITE: `(upper(job_description) LIKE '%BASEMENT%SUITE%' OR upper(job_description) LIKE '%SECONDARY SUITE%')`
+  };
+  if (cats[cat]) w += ' AND ' + cats[cat];
+  if (hood) w += ` AND upper(neighbourhood) LIKE '%${hood}%'`;
+
+  return `https://data.edmonton.ca/resource/24uj-dj8v.json?$query=${encodeURIComponent('SELECT * WHERE ' + w + ' ORDER BY issue_date DESC LIMIT 500')}`;
+}
+
+async function fetchLeads() {
+  const btn = document.getElementById('fetchBtn');
+  btn.disabled = true; btn.textContent = 'LOADING...';
+  document.getElementById('errorBar').style.display = 'none';
+  document.getElementById('statsBar').style.display = 'none';
+  document.getElementById('exportBtn').style.display = 'none';
+  document.getElementById('copyBtn').style.display = 'none';
+  document.getElementById('pagination').style.display = 'none';
+  expandedRows.clear(); researchCache = {};
+
+  document.getElementById('tableContent').innerHTML = `<div class="loading-state"><p>FETCHING EDMONTON PERMIT DATA...</p><div class="loading-bar"></div></div>`;
+
+  try {
+    const r = await fetch(buildQuery());
+    if (!r.ok) throw new Error(`API ${r.status}`);
+    const data = await r.json();
+    if (!data.length) {
+      document.getElementById('tableContent').innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>NO PERMITS FOUND</p><p style="margin-top:6px;color:#333">TRY WIDER FILTERS</p></div>`;
+    } else {
+      allLeads = data; currentPage = 1;
+      updateStats(data); renderTable();
+      document.getElementById('exportBtn').style.display = 'inline-block';
+      document.getElementById('copyBtn').style.display = 'inline-block';
+    }
+  } catch(e) {
+    document.getElementById('errorBar').textContent = 'ERROR: ' + e.message;
+    document.getElementById('errorBar').style.display = 'block';
+    document.getElementById('tableContent').innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>FAILED TO LOAD</p></div>`;
+  }
+  btn.disabled = false; btn.textContent = 'PULL LEADS';
+}
+
+function updateStats(data) {
+  document.getElementById('statsBar').style.display = 'grid';
+  const newB = data.filter(p => /NEW |CONSTRUCT/i.test(p.job_description||'')).length;
+  const vals = data.map(p => parseFloat(p.construction_value)||0).filter(v=>v>0);
+  const avg = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+  const hoods = new Set(data.map(p=>p.neighbourhood).filter(Boolean)).size;
+  document.getElementById('s-total').textContent = data.length;
+  document.getElementById('s-new').textContent = newB;
+  document.getElementById('s-value').textContent = avg ? '$'+Math.round(avg/1000)+'K' : '—';
+  document.getElementById('s-hoods').textContent = hoods;
+  document.getElementById('s-pipeline').textContent = pipeline.length;
+}
+
+function getBadge(p) {
+  const d = (p.job_description||'').toUpperCase(), t = (p.building_type||'').toUpperCase();
+  if (/BASEMENT SUITE|SECONDARY SUITE/.test(d)) return '<span class="badge badge-suite">SUITE</span>';
+  if (/FOURPLEX|TRIPLEX|ROW/.test(t+d)) return '<span class="badge badge-multi">MULTI-UNIT</span>';
+  if (/NEW |CONSTRUCT/.test(d)) return '<span class="badge badge-new">NEW BUILD</span>';
+  return '<span class="badge badge-reno">RENO</span>';
+}
+
+function fmtVal(v) {
+  const n = parseFloat(v);
+  if (!n) return '<span style="color:#333">—</span>';
+  return n>=1000000 ? '$'+(n/1000000).toFixed(1)+'M' : '$'+Math.round(n/1000)+'K';
+}
+
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function isInPipeline(p) {
+  return pipeline.some(pl => pl.address === p.address || pl.permitNum === p.permit_number);
+}
+
+function renderTable() {
+  const start = (currentPage-1)*PER_PAGE;
+  const page = allLeads.slice(start, start+PER_PAGE);
+  const total = Math.ceil(allLeads.length/PER_PAGE);
+
+  let html = `<table><thead><tr>
+    <th style="width:28px"></th>
+    <th>TYPE</th>
+    <th>ADDRESS</th>
+    <th>DESCRIPTION</th>
+    <th>NEIGHBOURHOOD</th>
+    <th>VALUE</th>
+    <th>DATE</th>
+    <th>PIPELINE</th>
+    <th>SEARCH</th>
+  </tr></thead><tbody>`;
+
+  page.forEach((p, i) => {
+    const inPipe = isInPipeline(p);
+    const addr = encodeURIComponent((p.address||'')+' Edmonton Alberta');
+    html += `<tr id="row-${i}" onclick="toggleRow(${i})">
+      <td><button class="expand-btn ${expandedRows.has(i)?'open':''}" id="xbtn-${i}">▶</button></td>
+      <td>${getBadge(p)}</td>
+      <td class="addr-cell">${p.address||'—'}<div class="permit-num">#${p.permit_number||'—'}</div></td>
+      <td class="desc-cell">${(p.job_description||'—').substring(0,120)}${(p.job_description||'').length>120?'...':''}</td>
+      <td class="hood-cell">${p.neighbourhood||'—'}</td>
+      <td class="val-cell">${fmtVal(p.construction_value)}</td>
+      <td class="date-cell">${fmtDate(p.issue_date)}</td>
+      <td onclick="event.stopPropagation()">
+        <button class="btn-sm" style="${inPipe?'background:var(--green-dim);color:var(--green);border-color:rgba(0,230,118,0.3)':''}" 
+          onclick="addToPipeline(${i})" id="pipe-btn-${i}">
+          ${inPipe?'✓ ADDED':'+ PIPELINE'}
+        </button>
+      </td>
+      <td onclick="event.stopPropagation()" style="white-space:nowrap">
+        <a href="https://www.google.com/search?q=${addr}+builder+contractor" target="_blank" class="dlink dlink-g" style="margin-right:3px">G</a>
+        <a href="https://www.facebook.com/search/top?q=${encodeURIComponent((p.address||'')+' Edmonton')}" target="_blank" class="dlink dlink-fb" style="margin-right:3px">FB</a>
+        <a href="https://www.google.com/maps/search/${addr}" target="_blank" class="dlink dlink-map">MAP</a>
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('tableContent').innerHTML = html;
+
+  // Pagination
+  if (total > 1) {
+    let pg = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>← PREV</button>`;
+    for (let i=1;i<=total;i++) {
+      if (i===1||i===total||Math.abs(i-currentPage)<=1) pg += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+      else if (Math.abs(i-currentPage)===2) pg += `<span style="color:var(--text-dim);padding:0 4px">…</span>`;
+    }
+    pg += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>NEXT →</button>`;
+    document.getElementById('pagination').innerHTML = pg;
+    document.getElementById('pagination').style.display = 'flex';
+  } else {
+    document.getElementById('pagination').style.display = 'none';
+  }
+}
+
+function goPage(n) {
+  const total = Math.ceil(allLeads.length/PER_PAGE);
+  if (n<1||n>total) return;
+  currentPage = n; expandedRows.clear(); renderTable();
+  document.querySelector('.table-wrap').scrollIntoView({behavior:'smooth'});
+}
+
+// ── ROW EXPAND ──
+function toggleRow(i) {
+  const existId = `rr-${i}`;
+  const existing = document.getElementById(existId);
+  const btn = document.getElementById(`xbtn-${i}`);
+  if (existing) {
+    existing.remove(); expandedRows.delete(i);
+    if(btn) btn.classList.remove('open'); return;
+  }
+  expandedRows.add(i);
+  if(btn) btn.classList.add('open');
+  const p = allLeads[(currentPage-1)*PER_PAGE + i];
+  const row = document.getElementById(`row-${i}`);
+  if (!row||!p) return;
+  const newRow = document.createElement('tr');
+  newRow.id = existId; newRow.className = 'research-row';
+  newRow.innerHTML = `<td colspan="9">${buildResearchPanel(p, i)}</td>`;
+  row.insertAdjacentElement('afterend', newRow);
+}
+
+function buildResearchPanel(p, i) {
+  const a = encodeURIComponent((p.address||'')+' Edmonton Alberta');
+  const as = encodeURIComponent((p.address||'')+' Edmonton');
+  const cached = researchCache[p.permit_number||i];
+
+  return `<div class="research-panel">
+    <div class="research-panel-title">
+      <span>${p.address||''} — BUILDER RESEARCH</span>
+      <span style="font-family:var(--mono);font-size:9px;color:var(--text-dim)">PERMIT #${p.permit_number||'—'} · ${fmtDate(p.issue_date)}</span>
+    </div>
+    <div class="research-grid">
+      <div>
+        <div class="research-col-title">🔍 FIND THE BUILDER</div>
+        <div class="link-cluster">
+          <a href="https://www.google.com/search?q=${a}+builder+home" target="_blank" class="dlink dlink-g">Google: Builder</a>
+          <a href="https://www.google.com/search?q=${encodeURIComponent('"'+(p.address||'')+'" Edmonton builder')}" target="_blank" class="dlink dlink-g">Google: Exact Address</a>
+          <a href="https://www.google.com/search?q=${a}+contractor+phone" target="_blank" class="dlink dlink-g">Google: Phone</a>
+          <a href="https://www.google.com/maps/search/${a}" target="_blank" class="dlink dlink-map">Google Maps</a>
+          <a href="https://www.honestdoor.com/permits/ab/edmonton?address=${encodeURIComponent(p.address||'')}" target="_blank" class="dlink dlink-green">HonestDoor</a>
+        </div>
+        <div class="research-col-title" style="margin-top:14px">📱 SOCIAL</div>
+        <div class="link-cluster">
+          <a href="https://www.facebook.com/search/top?q=${as}+builder" target="_blank" class="dlink dlink-fb">Facebook</a>
+          <a href="https://www.facebook.com/groups/search/?q=Edmonton+home+builders" target="_blank" class="dlink dlink-fb">FB Builder Groups</a>
+          <a href="https://www.linkedin.com/search/results/all/?keywords=${as}+builder" target="_blank" class="dlink dlink-li">LinkedIn</a>
+          <a href="https://www.instagram.com/explore/tags/edmontonbuilder/" target="_blank" class="dlink dlink-li" style="background:rgba(225,48,108,0.1);color:#e1306c;border-color:rgba(225,48,108,0.2)">Instagram</a>
+        </div>
+        <div class="research-col-title" style="margin-top:14px">📋 DIRECTORIES</div>
+        <div class="link-cluster">
+          <a href="https://www.bbb.org/search?find_text=home+builder&find_loc=Edmonton%2C+AB" target="_blank" class="dlink dlink-dir">BBB</a>
+          <a href="https://www.yellowpages.ca/search/si/1/home+builders/Edmonton+AB" target="_blank" class="dlink dlink-dir">Yellow Pages</a>
+          <a href="https://www.kijiji.ca/b-contractors-trades/edmonton/home+builder/k0c791l1700203" target="_blank" class="dlink dlink-dir">Kijiji</a>
+          <a href="https://www.houzz.com/professionals/search?location=Edmonton%2C+AB" target="_blank" class="dlink dlink-dir">Houzz</a>
+        </div>
+      </div>
+      <div>
+        <div class="research-col-title">🤖 AI BUILDER RESEARCH</div>
+        <div class="ai-box ${cached?'active':''}" id="ai-${i}">
+          ${cached || `<div class="ai-placeholder">Click the button below to copy a research prompt to your clipboard and open Claude.ai.<br><br>Just paste → send → get builder intel in 10 seconds.</div>`}
+        </div>
+        <button class="btn-sm" style="margin-top:8px;width:100%" onclick="doAiResearch(${i})">
+          ⚡ COPY PROMPT + OPEN CLAUDE
+        </button>
+        <div style="margin-top:12px">
+          <div class="research-col-title">📌 QUICK ACTIONS</div>
+          <div class="link-cluster">
+            <button class="dlink dlink-green" style="cursor:pointer;border:none" onclick="addToPipelineFromResearch(${i})">+ ADD TO PIPELINE</button>
+            <button class="dlink" style="background:var(--yellow-dim);color:var(--yellow);border:1px solid rgba(255,214,0,0.2);cursor:pointer" onclick="copyAddress(${i})">COPY ADDRESS</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function doAiResearch(i) {
+  const p = allLeads[(currentPage-1)*PER_PAGE + i];
+  if (!p) return;
+  const prompt = `I'm an HVAC contractor in Edmonton Alberta trying to identify the builder behind this new construction permit so I can reach out and offer my mechanical services (rough-in, furnace, HRV, A/C installs for new construction).
+
+Permit details:
+- Address: ${p.address||'Unknown'}
+- Neighbourhood: ${p.neighbourhood||'Unknown'}
+- Description: ${p.job_description||'Unknown'}
+- Building Type: ${p.building_type||'Unknown'}
+- Construction Value: ${p.construction_value ? '$'+p.construction_value : 'Unknown'}
+- Permit Date: ${p.issue_date ? p.issue_date.split('T')[0] : 'Unknown'}
+
+Please give me:
+1. What type of builder likely pulled this permit (infill developer, production builder, custom home builder) based on value and project type
+2. Which builders are known to operate in this specific Edmonton neighbourhood
+3. Exact Google search terms and Facebook search terms to find this specific builder
+4. A short cold outreach pitch I can use (phone or DM) — I offer fast quotes, clean installs, and I work well with small to mid builders
+5. Priority rating for this lead (HIGH/MED/LOW) and why`;
+
+  try { await navigator.clipboard.writeText(prompt); } catch(e) {
+    const t = document.createElement('textarea');
+    t.value = prompt; document.body.appendChild(t); t.select();
+    document.execCommand('copy'); document.body.removeChild(t);
+  }
+
+  window.open('https://claude.ai/new', '_blank');
+
+  const box = document.getElementById(`ai-${i}`);
+  if (box) {
+    box.classList.add('active');
+    box.innerHTML = `<div class="ai-result"><strong style="color:var(--green)">✓ Prompt copied to clipboard</strong><br><br>Claude.ai is open in a new tab. Paste (Ctrl+V) and hit send. Come back here when done and work the next lead.</div>`;
+    researchCache[p.permit_number||i] = box.innerHTML;
+  }
+}
+
+function addToPipeline(i) {
+  const p = allLeads[(currentPage-1)*PER_PAGE + i];
+  if (!p || isInPipeline(p)) return;
+  pipeline.push({
+    id: Date.now(), address: p.address, permitNum: p.permit_number,
+    neighbourhood: p.neighbourhood, description: p.job_description,
+    value: p.construction_value, date: new Date().toISOString().split('T')[0],
+    status: 'NEW', builder: '', contact: '', notes: '', type: getBadgeText(p)
+  });
+  savePipeline();
+  const btn = document.getElementById(`pipe-btn-${i}`);
+  if (btn) { btn.textContent = '✓ ADDED'; btn.style.cssText = 'background:var(--green-dim);color:var(--green);border-color:rgba(0,230,118,0.3)'; }
+  if (document.getElementById('s-pipeline')) document.getElementById('s-pipeline').textContent = pipeline.length;
+  logActivity(`Added ${p.address} to pipeline`);
+}
+
+function addToPipelineFromResearch(i) {
+  addToPipeline(i);
+}
+
+function getBadgeText(p) {
+  const d = (p.job_description||'').toUpperCase(), t = (p.building_type||'').toUpperCase();
+  if (/BASEMENT SUITE|SECONDARY SUITE/.test(d)) return 'SUITE';
+  if (/FOURPLEX|TRIPLEX|ROW/.test(t+d)) return 'MULTI-UNIT';
+  if (/NEW |CONSTRUCT/.test(d)) return 'NEW BUILD';
+  return 'RENO';
+}
+
+function copyAddress(i) {
+  const p = allLeads[(currentPage-1)*PER_PAGE + i];
+  if (!p) return;
+  navigator.clipboard.writeText((p.address||'')+', Edmonton AB').catch(()=>{});
+}
+
+function exportCSV() {
+  if (!allLeads.length) return;
+  const h = ['Address','Neighbourhood','Description','Building Type','Value','Date','Permit #'];
+  const rows = allLeads.map(p=>[p.address||'',p.neighbourhood||'',(p.job_description||'').replace(/,/g,';'),p.building_type||'',p.construction_value||'',p.issue_date?p.issue_date.split('T')[0]:'',p.permit_number||'']);
+  const csv = [h,...rows].map(r=>r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = `yeg_permits_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+}
+
+function copyAddresses() {
+  const txt = allLeads.map(p=>`${p.address}, Edmonton AB`).join('\n');
+  navigator.clipboard.writeText(txt).then(()=>{
+    const b = document.getElementById('copyBtn');
+    b.textContent='COPIED!'; setTimeout(()=>b.textContent='COPY ADDRESSES',2000);
+  });
+}
+
+// ══════════════════════════════
+// MAP
+// ══════════════════════════════
+function renderMap() {
+  if (!allLeads.length) {
+    document.getElementById('mapNoData').style.display = 'flex';
+    document.getElementById('mapSidebar').style.display = 'none';
+    document.getElementById('mapFrame').style.display = 'none';
+    return;
+  }
+  document.getElementById('mapNoData').style.display = 'none';
+  document.getElementById('mapSidebar').style.display = 'flex';
+  document.getElementById('mapFrame').style.display = 'block';
+
+  const geo = allLeads.filter(p => p.latitude && p.longitude);
+  document.getElementById('mapLeadCount').textContent = geo.length + ' LOCATIONS LOADED';
+
+  // Build OpenStreetMap URL centered on Edmonton
+  const lat = 53.5461, lng = -113.4938;
+  document.getElementById('mapFrame').src = `https://www.openstreetmap.org/export/embed.html?bbox=${lng-0.3}%2C${lat-0.2}%2C${lng+0.3}%2C${lat+0.2}&layer=mapnik&marker=${lat}%2C${lng}`;
+
+  // Sidebar list
+  let html = '';
+  allLeads.slice(0, 100).forEach((p, i) => {
+    html += `<div class="map-lead-item" onclick="openMapAddress('${encodeURIComponent((p.address||'')+', Edmonton AB')}')">
+      <div class="map-lead-addr">${p.address||'Unknown'}</div>
+      <div class="map-lead-meta">${p.neighbourhood||'—'} · <span class="map-lead-val">${fmtVal(p.construction_value)}</span> · ${fmtDate(p.issue_date)}</div>
+    </div>`;
+  });
+  document.getElementById('mapLeadList').innerHTML = html;
+}
+
+function openMapAddress(addr) {
+  const url = `https://www.google.com/maps/search/${addr}`;
+  window.open(url, '_blank');
+}
+
+// ══════════════════════════════
+// PIPELINE
+// ══════════════════════════════
+const STATUSES = ['NEW','CONTACTED','QUOTED','CLOSED','DEAD'];
+const STATUS_COLORS = {NEW:'var(--green)',CONTACTED:'var(--blue)',QUOTED:'var(--yellow)',CLOSED:'var(--orange)',DEAD:'#555'};
+const STATUS_LABELS = {NEW:'🟢 New',CONTACTED:'🔵 Contacted',QUOTED:'🟡 Quoted',CLOSED:'🟠 Closed',DEAD:'⚫ Dead'};
+
+function savePipeline() {
+  localStorage.setItem('yeg_pipeline', JSON.stringify(pipeline));
+}
+
+function renderPipeline() {
+  STATUSES.forEach(s => {
+    const count = pipeline.filter(p=>p.status===s).length;
+    const key = {NEW:'new',CONTACTED:'cont',QUOTED:'quot',CLOSED:'clos',DEAD:'dead'}[s];
+    if(document.getElementById('pl-'+key)) document.getElementById('pl-'+key).textContent = count;
+  });
+
+  const board = document.getElementById('pipelineBoard');
+  board.innerHTML = STATUSES.map(status => {
+    const leads = pipeline.filter(p=>p.status===status);
+    const cards = leads.map(lead => `
+      <div class="pipeline-card" onclick="openLeadModal('${lead.id}')">
+        <div class="pipeline-card-addr">${lead.address||lead.type||'Unknown'}</div>
+        <div class="pipeline-card-meta">
+          ${lead.builder ? `<div>👤 ${lead.builder}</div>` : ''}
+          ${lead.contact ? `<div>📞 ${lead.contact}</div>` : ''}
+          ${lead.value ? `<div class="pipeline-card-val">💰 $${parseInt(lead.value).toLocaleString()}</div>` : ''}
+          <div>📅 ${lead.date||'—'}</div>
+          ${lead.notes ? `<div style="margin-top:4px;color:var(--text-dim)">${lead.notes.substring(0,60)}${lead.notes.length>60?'...':''}</div>` : ''}
+        </div>
+        <div class="pipeline-card-actions">
+          ${STATUSES.filter(s=>s!==status).map(s=>`<button class="btn-sm" style="font-size:10px;padding:3px 8px" onclick="event.stopPropagation();moveCard('${lead.id}','${s}')">${s}</button>`).join('')}
+          <button class="btn-sm" style="font-size:10px;padding:3px 8px;background:var(--red-dim);color:var(--red);border-color:rgba(255,23,68,0.2)" onclick="event.stopPropagation();deleteLead('${lead.id}')">✕</button>
+        </div>
+      </div>`).join('');
+
+    return `<div class="pipeline-col">
+      <div class="pipeline-col-header">
+        <div class="pipeline-col-name" style="color:${STATUS_COLORS[status]}">${STATUS_LABELS[status]}</div>
+        <div class="pipeline-count" style="color:${STATUS_COLORS[status]}">${leads.length}</div>
+      </div>
+      <div class="pipeline-cards">${cards}</div>
+      <button class="add-lead-btn" onclick="openAddModal('${status}')">+ ADD</button>
+    </div>`;
+  }).join('');
+}
+
+function moveCard(id, status) {
+  const lead = pipeline.find(p=>p.id==id);
+  if (lead) { lead.status = status; savePipeline(); renderPipeline(); logActivity(`Moved ${lead.address||'lead'} to ${status}`); }
+}
+
+function deleteLead(id) {
+  pipeline = pipeline.filter(p=>p.id!=id);
+  savePipeline(); renderPipeline();
+}
+
+function openLeadModal(id) {
+  const lead = pipeline.find(p=>p.id==id);
+  if (!lead) return;
+  document.getElementById('lm-title').textContent = lead.address || 'LEAD DETAIL';
+  document.getElementById('lm-body').innerHTML = `
+    <div class="form-group"><label>Status</label>
+      <select onchange="moveCard('${lead.id}', this.value)">
+        ${STATUSES.map(s=>`<option value="${s}" ${lead.status===s?'selected':''}>${STATUS_LABELS[s]}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Builder / Contact</label>
+      <input type="text" value="${lead.builder||''}" onchange="updateLead('${lead.id}','builder',this.value)" placeholder="Builder name">
+    </div>
+    <div class="form-group"><label>Phone / Email</label>
+      <input type="text" value="${lead.contact||''}" onchange="updateLead('${lead.id}','contact',this.value)" placeholder="Contact info">
+    </div>
+    <div class="form-group"><label>Est. Value ($)</label>
+      <input type="number" value="${lead.value||''}" onchange="updateLead('${lead.id}','value',this.value)">
+    </div>
+    <div class="form-group"><label>Notes</label>
+      <textarea onchange="updateLead('${lead.id}','notes',this.value)">${lead.notes||''}</textarea>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a href="https://www.google.com/search?q=${encodeURIComponent((lead.address||''))+'+Edmonton+builder'}" target="_blank" class="btn-sm">Google</a>
+      <a href="https://www.facebook.com/search/top?q=${encodeURIComponent((lead.address||'')+' Edmonton')}" target="_blank" class="btn-sm">Facebook</a>
+      <a href="https://www.google.com/maps/search/${encodeURIComponent((lead.address||'')+' Edmonton')}" target="_blank" class="btn-sm">Maps</a>
+      <button class="btn-sm" style="background:var(--red-dim);color:var(--red);border-color:rgba(255,23,68,0.2)" onclick="deleteLead('${lead.id}');closeLeadModal()">DELETE LEAD</button>
+    </div>`;
+  document.getElementById('leadModal').classList.add('open');
+}
+
+function updateLead(id, field, val) {
+  const lead = pipeline.find(p=>p.id==id);
+  if (lead) { lead[field]=val; savePipeline(); }
+}
+
+function closeLeadModal() { document.getElementById('leadModal').classList.remove('open'); renderPipeline(); }
+
+let _addModalStatus = 'NEW';
+function openAddModal(status) {
+  _addModalStatus = status || 'NEW';
+  document.getElementById('m-addr').value='';
+  document.getElementById('m-builder').value='';
+  document.getElementById('m-contact').value='';
+  document.getElementById('m-notes').value='';
+  document.getElementById('m-value').value='';
+  document.getElementById('addModal').classList.add('open');
+}
+function closeModal() { document.getElementById('addModal').classList.remove('open'); }
+
+function saveNewLead() {
+  const addr = document.getElementById('m-addr').value.trim();
+  if (!addr) return;
+  pipeline.push({
+    id: Date.now(), address: addr,
+    builder: document.getElementById('m-builder').value.trim(),
+    contact: document.getElementById('m-contact').value.trim(),
+    type: document.getElementById('m-type').value,
+    value: document.getElementById('m-value').value,
+    notes: document.getElementById('m-notes').value.trim(),
+    status: _addModalStatus, date: new Date().toISOString().split('T')[0]
+  });
+  savePipeline(); closeModal(); renderPipeline();
+  logActivity(`Manually added ${addr} to pipeline`);
+}
+
+// ══════════════════════════════
+// SCRIPTS
+// ══════════════════════════════
+const SCRIPTS = [
+  {
+    title: 'COLD CALL — BUILDER ON SITE',
+    tag: '📞 PHONE · 30 SECONDS',
+    tagColor: 'var(--green)',
+    text: `"Hey, is this the builder for [address]? 
+
+My name's [YOUR NAME], I run an HVAC company here in Edmonton — we specialize in new construction, fourplexes, infills. 
+
+I was driving the area and noticed you've got a project going. Wondering if you're locked in on your mechanical sub or if there's room to quote?
+
+We're fast, we pull our own permits, and we work well with builders who move quick."`,
+    tip: '💡 If they say they have someone: "Totally understand — mind if I leave a card in case they ever fall through?"'
+  },
+  {
+    title: 'FACEBOOK / INSTAGRAM DM',
+    tag: '📱 SOCIAL · 60 WORDS',
+    tagColor: 'var(--blue)',
+    text: `Hey [NAME] — saw your project going up at [ADDRESS/NEIGHBOURHOOD]. 
+
+I run an HVAC company in Edmonton focused on new construction — fourplexes, infills, custom homes. We do rough-in, furnace, HRV, A/C.
+
+Fast quotes, clean work, we know how to work around tight build schedules.
+
+If you ever need a second mechanical quote or your current sub isn't cutting it — happy to talk.
+
+— [YOUR NAME]`,
+    tip: '💡 Keep it short. Builders get long DMs ignored. This one gets read.'
+  },
+  {
+    title: 'FOLLOW-UP CALL (2nd TOUCH)',
+    tag: '📞 PHONE · 20 SECONDS',
+    tagColor: 'var(--yellow)',
+    text: `"Hey [NAME], it's [YOUR NAME] from [COMPANY] — I reached out a couple weeks back about your project on [STREET].
+
+Just following up — have you locked in your mechanical sub yet or still sorting that out?
+
+We've got availability right now and can turn a quote around same day."`,
+    tip: '💡 Most builders need 2-3 touches. The follow-up is where most subs give up. You don\'t.'
+  },
+  {
+    title: 'REFERRAL ASK — EXISTING CLIENT',
+    tag: '💬 CONVERSATION · USE WITH RAVI',
+    tagColor: 'var(--orange)',
+    text: `"Hey [RAVI/NAME] — quick question.
+
+We're looking to take on 2-3 more builders this season. Is there anyone in your circle you'd be comfortable introducing us to? Even just a name — I'll handle the reach out.
+
+We'll make sure whoever you send our way gets the same service you do."`,
+    tip: '💡 One warm referral from Ravi is worth 20 cold calls. Ask directly.'
+  },
+  {
+    title: 'VOICEMAIL SCRIPT',
+    tag: '📞 VOICEMAIL · 20 SECONDS',
+    tagColor: 'var(--purple)',
+    text: `"Hey [NAME], this is [YOUR NAME] with [COMPANY] — Edmonton HVAC, new construction. 
+
+I was looking at some permits in [NEIGHBOURHOOD] and saw your project. 
+
+Give me a call back at [NUMBER] if you need a mechanical quote — we're fast and we know new builds. 
+
+[NUMBER] again. Thanks."`,
+    tip: '💡 Keep voicemails under 25 seconds. State who you are, what you do, your number twice. Done.'
+  },
+  {
+    title: 'TEXT MESSAGE FOLLOW-UP',
+    tag: '💬 TEXT · AFTER FIRST CALL',
+    tagColor: 'var(--green)',
+    text: `Hey [NAME] — [YOUR NAME] here, HVAC Edmonton. 
+
+Spoke briefly earlier about [PROJECT/ADDRESS]. Sending my number so it's easy to reach me when you're ready to sort out mechanical.
+
+[YOUR NUMBER]
+
+Happy to come out and quote same day.`,
+    tip: '💡 Always follow a call with a text. Builders are on site — texts get seen when calls don\'t.'
+  }
+];
+
+function renderScripts() {
+  document.getElementById('scriptsGrid').innerHTML = SCRIPTS.map(s => `
+    <div class="script-card">
+      <div class="script-header">
+        <div class="script-title">${s.title}</div>
+        <div class="script-tag" style="color:${s.tagColor}">${s.tag}</div>
+      </div>
+      <div class="script-body">
+        <div class="script-text">${s.text}</div>
+        <div class="script-tip">${s.tip}</div>
+        <button class="btn-sm" style="margin-top:10px;width:100%" onclick="copyScript(this, \`${s.text.replace(/`/g,"'")}\`)">COPY SCRIPT</button>
+      </div>
+    </div>`).join('');
+}
+
+function copyScript(btn, text) {
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='COPIED ✓';
+    setTimeout(()=>btn.textContent='COPY SCRIPT',2000);
+  });
+}
+
+// ══════════════════════════════
+// TRACKER
+// ══════════════════════════════
+const GOALS = { calls: 5, visits: 3, quotes: 5, research: 10 };
+const LABELS = { calls: 'Outreach Call/DM', visits: 'Site Visit', quotes: 'Quote Sent', research: 'Lead Researched' };
+
+function getToday() { return new Date().toISOString().split('T')[0]; }
+function getWeek() {
+  const d = new Date(); d.setDate(d.getDate() - d.getDay());
+  return d.toISOString().split('T')[0];
+}
+
+function tally(type) {
+  const today = getToday();
+  if (!tracker[today]) tracker[today] = {calls:0,visits:0,quotes:0,research:0};
+  tracker[today][type]++;
+  localStorage.setItem('yeg_tracker', JSON.stringify(tracker));
+  logActivity(`Logged: ${LABELS[type]}`);
+  renderTracker();
+}
+
+function untally(type) {
+  const today = getToday();
+  if (!tracker[today]) return;
+  if (tracker[today][type] > 0) tracker[today][type]--;
+  localStorage.setItem('yeg_tracker', JSON.stringify(tracker));
+  renderTracker();
+}
+
+function logActivity(text) {
+  const now = new Date();
+  const time = now.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'});
+  activityLog.unshift({time, text, date: getToday()});
+  if (activityLog.length > 100) activityLog = activityLog.slice(0,100);
+  localStorage.setItem('yeg_activity', JSON.stringify(activityLog));
+  if (document.getElementById('activityLog')) renderActivityLog();
+}
+
+function renderActivityLog() {
+  const today = getToday();
+  const todayLog = activityLog.filter(a => a.date === today);
+  if (!todayLog.length) {
+    document.getElementById('activityLog').innerHTML = `<div class="activity-item"><div class="activity-time">—</div><div class="activity-text" style="color:var(--text-dim)">No activity today yet.</div></div>`;
+    return;
+  }
+  document.getElementById('activityLog').innerHTML = todayLog.map(a=>`
+    <div class="activity-item">
+      <div class="activity-time">${a.time}</div>
+      <div class="activity-text">${a.text}</div>
+    </div>`).join('');
+}
+
+function renderTracker() {
+  const today = getToday();
+  const todayData = tracker[today] || {calls:0,visits:0,quotes:0,research:0};
+
+  // Weekly totals
+  const weekData = {calls:0,visits:0,quotes:0,research:0};
+  Object.entries(tracker).forEach(([d,v])=>{
+    if (d >= getWeek()) { Object.keys(weekData).forEach(k=>weekData[k]+=(v[k]||0)); }
+  });
+
+  document.getElementById('calls-today').textContent = todayData.calls;
+  document.getElementById('visits-today').textContent = todayData.visits;
+  document.getElementById('quotes-week').textContent = weekData.quotes;
+  document.getElementById('research-today').textContent = todayData.research;
+
+  document.getElementById('calls-bar').style.width = Math.min(100, (todayData.calls/GOALS.calls)*100)+'%';
+  document.getElementById('visits-bar').style.width = Math.min(100, (todayData.visits/GOALS.visits)*100)+'%';
+  document.getElementById('quotes-bar').style.width = Math.min(100, (weekData.quotes/GOALS.quotes)*100)+'%';
+  document.getElementById('research-bar').style.width = Math.min(100, (todayData.research/GOALS.research)*100)+'%';
+
+  // Weekly summary
+  document.getElementById('weeklySummary').innerHTML = `
+    📞 Calls/DMs this week: <strong style="color:var(--orange)">${weekData.calls}</strong> / goal: ${GOALS.calls*5}<br>
+    🏗️ Site visits this week: <strong style="color:var(--green)">${weekData.visits}</strong> / goal: ${GOALS.visits*5}<br>
+    📋 Quotes sent this week: <strong style="color:var(--yellow)">${weekData.quotes}</strong> / goal: ${GOALS.quotes}<br>
+    🔍 Leads researched this week: <strong style="color:var(--purple)">${weekData.research}</strong> / goal: ${GOALS.research*5}<br>
+    ⚡ Pipeline leads total: <strong style="color:var(--orange)">${pipeline.length}</strong>
+  `;
+
+  renderActivityLog();
+}
+
+function resetWeek() {
+  if (!confirm('Reset this week\'s tracker? Activity log is kept.')) return;
+  const today = getToday();
+  tracker[today] = {calls:0,visits:0,quotes:0,research:0};
+  localStorage.setItem('yeg_tracker', JSON.stringify(tracker));
+  renderTracker();
+}
+
+// ══════════════════════════════
+// INIT
+// ══════════════════════════════
+renderScripts();
+renderPipeline();
+renderTracker();
+
+// Close modals on overlay click
+document.getElementById('addModal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+document.getElementById('leadModal').addEventListener('click', function(e){ if(e.target===this) closeLeadModal(); });
+</script>
+</body>
+</html>
